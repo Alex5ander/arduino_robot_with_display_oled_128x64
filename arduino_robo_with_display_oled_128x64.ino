@@ -1,5 +1,3 @@
-
-//
 //#define TRIGGER A1
 //#define ECHO A0
 //
@@ -14,11 +12,11 @@
 LCD_SSD1306 lcd;
 
 void back() {
-//    digitalWrite(MA1, HIGH);
-//    digitalWrite(MA2, LOW);
+//  digitalWrite(MA1, HIGH);
+//  digitalWrite(MA2, LOW);
 //   
-//    digitalWrite(MB1, LOW);
-//    digitalWrite(MB2, HIGH);
+//  digitalWrite(MB1, LOW);
+//  digitalWrite(MB2, HIGH);
 
     PORTD = PORTD | (1 << PD2);
     PORTD = PORTD &~ (1 << PD3);
@@ -28,11 +26,11 @@ void back() {
 }
 
 void front() {
-//    digitalWrite(MA1, LOW);
-//    digitalWrite(MA2, HIGH);
+//  digitalWrite(MA1, LOW);
+//  digitalWrite(MA2, HIGH);
 //   
-//    digitalWrite(MB1, HIGH);
-//    digitalWrite(MB2, LOW);
+//  digitalWrite(MB1, HIGH);
+//  digitalWrite(MB2, LOW);
 
     PORTD = PORTD &~ (1 << PD2);
     PORTD = PORTD | (1 << PD3);
@@ -42,11 +40,11 @@ void front() {
 }
 
 void stop() {
-//    digitalWrite(MA1, LOW);
-//    digitalWrite(MA2, LOW);
+//  digitalWrite(MA1, LOW);
+//  digitalWrite(MA2, LOW);
 //   
-//    digitalWrite(MB1, LOW);
-//    digitalWrite(MB2, LOW);
+//  digitalWrite(MB1, LOW);
+//  digitalWrite(MB2, LOW);
 
     PORTD = PORTD &~ (1 << PD2);
     PORTD = PORTD &~ (1 << PD3);
@@ -56,11 +54,11 @@ void stop() {
 }
 
 void right() {
-//    digitalWrite(MA1, LOW);
-//    digitalWrite(MA2, HIGH);
+//  digitalWrite(MA1, LOW);
+//  digitalWrite(MA2, HIGH);
 //   
-//    digitalWrite(MB1, LOW);
-//    digitalWrite(MB2, HIGH);
+//  digitalWrite(MB1, LOW);
+//  digitalWrite(MB2, HIGH);
 
     PORTD = PORTD &~ (1 << PD2);
     PORTD = PORTD | (1 << PD3);
@@ -70,11 +68,11 @@ void right() {
 }
 
 void left() {
-//    digitalWrite(MA1, HIGH);
-//    digitalWrite(MA2, LOW);
+//  digitalWrite(MA1, HIGH);
+//  digitalWrite(MA2, LOW);
 //   
-//    digitalWrite(MB1, HIGH);
-//    digitalWrite(MB2, LOW);
+//  digitalWrite(MB1, HIGH);
+//  digitalWrite(MB2, LOW);
 
     PORTD = PORTD | (1 << PD2);
     PORTD = PORTD &~ (1 << PD3);
@@ -84,30 +82,30 @@ void left() {
 }
 
 float detect() {
-//    digitalWrite(TRIGGER, 1);
+//  digitalWrite(TRIGGER, 1);
     PORTC = PORTC | (1 << PC1);
     delayMicroseconds(2);
-//    digitalWrite(TRIGGER, 0);
+//  digitalWrite(TRIGGER, 0);
     PORTC = PORTC &~ (1 << PC1);
     return (pulseIn(A0, 1) * 0.01715);
 }
 
 void setup() {
-//    pinMode(MA1, OUTPUT);
-//    pinMode(MA2, OUTPUT);
+//  pinMode(MA1, OUTPUT);
+//  pinMode(MA2, OUTPUT);
 //   
-//    pinMode(MB1, OUTPUT);
-//    pinMode(MB2, OUTPUT);
+//  pinMode(MB1, OUTPUT);
+//  pinMode(MB2, OUTPUT);
 
     DDRD = DDRD | (1 << DDD2);
     DDRD = DDRD | (1 << DDD3);
     DDRD = DDRD | (1 << DDD4);
     DDRD = DDRD | (1 << DDD5);
    
-//    pinMode(ECHO, INPUT);
-//    pinMode(TRIGGER, OUTPUT);
-//    pinMode(13, OUTPUT);
-//    digitalWrite(13,0);
+//  pinMode(ECHO, INPUT);
+//  pinMode(TRIGGER, OUTPUT);
+//  pinMode(13, OUTPUT);
+//  digitalWrite(13,0);
 
     DDRC = DDRC &~ (1 << DDC0);
     DDRC = DDRC | (1 << DDC1);
@@ -129,22 +127,45 @@ void setup() {
       lcd.setCursor(0, 6);
       lcd.print(v);
       lcd.print("cm/s  ");
+
+      float ds[] = {0, 0};
       
-      if(d < 10) {
+      if(d < 20) {
         stop();
-        delay(200);
+        delay(100);
         back();
-        delay(200);
-        if(rand() % 2 == 0) {
+        delay(400);
+        stop();
+        delay(100);
+        
+        right();
+        delay(300);
+        stop();
+        delay(100);
+        ds[0] = detect();
+        
+        left();
+        delay(600);
+        stop();
+        delay(100);
+        ds[1] = detect();
+        
+        right();
+        delay(300);
+        stop();
+        delay(100);
+        
+        if(ds[0] > ds[1] && ds[0] > 20) {
           right();
-        }else {
+          delay(300);
+        }else if(ds[0] < ds[1] && ds[1] > 20) {
           left();
+          delay(300);
         }
-        delay(200);
         stop();
       }
         
-      if( d > 10){
+      if( d > 20){
         front();
       }else {
         stop();
