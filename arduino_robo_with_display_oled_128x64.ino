@@ -7,9 +7,16 @@
 //#define MB1 4
 //#define MB2 5
 
-#include<MicroLCD.h>
+#include <Wire.h>
+#include <Adafruit_SSD1306.h>
+#include <Adafruit_GFX.h>
 
-LCD_SSD1306 lcd;
+#define OLED_WIDTH 128
+#define OLED_HEIGHT 64
+
+#define OLED_ADDR 0x3C
+
+Adafruit_SSD1306 lcd(OLED_WIDTH, OLED_HEIGHT);
 
 void back() {
 //  digitalWrite(MA1, HIGH);
@@ -112,21 +119,23 @@ void setup() {
     DDRB = DDRB | (1 << PB5);
     PORTB = PORTB &~ (1 << PB5);
 
-    lcd.begin();
+    lcd.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR);
     float v = 0;
     while(1) {
       float d = detect();
-      lcd.setCursor(0, 0);
-      lcd.setFontSize(FONT_SIZE_MEDIUM);
-      lcd.print("Distancia:");
-      lcd.setCursor(0, 2);
+      lcd.clearDisplay();
+      lcd.drawRoundRect(0, 0, 128, 64, 8, WHITE);
+      lcd.setTextColor(WHITE);
+      lcd.setTextSize(1);
+      lcd.setCursor(16, 8);
+      lcd.print("DISTANCE: ");
       lcd.print(d);
-      lcd.print("cm   ");
-      lcd.setCursor(0, 4);
-      lcd.print("Velocidade:");
-      lcd.setCursor(0, 6);
+      lcd.print(" cm");
+      lcd.setCursor(16, 28);
+      lcd.print("SPEED: ");
       lcd.print(v);
-      lcd.print("cm/s  ");
+      lcd.print(" cm/s");
+      lcd.display();
 
       float ds[] = {0, 0};
       
@@ -167,10 +176,9 @@ void setup() {
         
       if( d > 20){
         front();
+        v = (d - detect()) / 2;
       }else {
         stop();
       }
-
-      v = (d - detect()) / 2;
     }
 }
